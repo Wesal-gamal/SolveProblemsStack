@@ -223,5 +223,52 @@ namespace TestingProgram.Controllers
          //   return HttpHandeller.GetResult(new RepositoryActionResult(result: null, status: RepositoryActionStatus.NotFound, exception: null, message: "No Company with Unique Name: " ));
         }
 
+        [HttpPost(nameof(NewUpdateAccount))]
+        public async Task<IRepositoryResult> NewUpdateAccount([FromBody] NewUpdateUserParameters NewUser)
+        {
+            // var newPasswordHash = PasswordHasher.HashPassword(password);
+
+            //var data = Encoding.ASCII.GetBytes(password);
+            //var md5 = new MD5CryptoServiceProvider();
+            //var md5data = md5.ComputeHash(data);
+            //var hashedPassword = ASCIIEncoding.GetString(md5data);
+
+            //string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+            //var DataOfUser = await _unitofworkUsers.Repository.FirstOrDefault(q => q.Id == ID);
+            //if (DataOfUser != null)
+            //{
+
+            //    var passwordHasher = new PasswordHasher<ApplicationUser>();
+            //    var user = new ApplicationUser();
+            //    user.UserName = DataOfUser.UserName;
+            //    user.Name = DataOfUser.Name;
+            //    var hashedPassword = passwordHasher.HashPassword(user, password);
+            //}
+
+            var user = await _unitofworkUsers.Repository.FirstOrDefault(q => q.Id == NewUser.Id);
+            if (user == null)
+            {
+                var repositoryResNotCorrect = _repositoryActionResult.GetRepositoryActionResult(message: "There is not found this user", status: RepositoryActionStatus.NotFound);
+                var resultNotCorrect = HttpHandeller.GetResult(repositoryResNotCorrect);
+                return resultNotCorrect;
+            }
+            user.UserName = NewUser.UserName;
+            user.Name = NewUser.Name;
+            user.Email = NewUser.Email;
+
+            var result = await _userManager.ChangePasswordAsync(user, NewUser.CurrentPassword, NewUser.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                var repositoryResNotCorrect = _repositoryActionResult.GetRepositoryActionResult(message: "There is not Succeeded", status: RepositoryActionStatus.BadRequest);
+                var resultNotCorrect = HttpHandeller.GetResult(repositoryResNotCorrect);
+                return resultNotCorrect;
+            }
+
+            var repositoryRes = _repositoryActionResult.GetRepositoryActionResult(message: "Updated successfully", status: RepositoryActionStatus.Ok);
+            var result2 = HttpHandeller.GetResult(repositoryRes);
+            return result2;
+        }
+
     }
 }
