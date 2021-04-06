@@ -17,12 +17,16 @@ namespace TestingProgram.Parameter
         public string User_Id { get; set; }
         public int Problem_Id { get; set; }
         public string Content { get; set; }
+        public string Date { get; set; }
+
     }
 
     public class SolutionsParametersUpadte
     {
         public int Id { get; set; }
         public string Content { get; set; }
+        public string Date { get; set; }
+
     }
 
 }

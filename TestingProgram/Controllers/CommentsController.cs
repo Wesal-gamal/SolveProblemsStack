@@ -49,7 +49,9 @@ namespace TestingProgram.Controllers
                 comment.Solution_Id = CommentsPrm.Solution_Id;
                 comment.User_Id = _ISolutionsBusiness.GetUserId();
                 comment.Content = CommentsPrm.Content;
-               var added =   _unitofworkComments.Repository.Add(comment);
+                comment.Date = DateTime.Now;
+
+                var added =   _unitofworkComments.Repository.Add(comment);
              if(added != null )
               { 
                 var saved = await _unitofworkComments.SaveChanges() > 0;
@@ -120,7 +122,7 @@ namespace TestingProgram.Controllers
             commentDto.Problem_Id = Comment.Solution_Id;
             commentDto.User_Id = Comment.User_Id;
             commentDto.Content  = Comment.Content;
-
+            commentDto .Date = Comment.Date.ToString("yyyy-MM-dd H:mm");
 
             var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(commentDto, status: RepositoryActionStatus.Ok);
             var result = HttpHandeller.GetResult(repositoryResult);
@@ -140,7 +142,7 @@ namespace TestingProgram.Controllers
                     comments.Id = comment.id;
                     comments.Solution_Id = comment.Problem_Id;
                     comments.Content = comment.Content;
-
+                    comments.Date = DateTime.Now;
                     _unitofworkComments.Repository.Update(comments);
                     var result = await _unitofworkComments.SaveChanges() > 0;
                     if (result)
@@ -213,6 +215,7 @@ namespace TestingProgram.Controllers
                 comLik.Comment_Id = CommentId;
                 comLik.Like = Like;
                 comLik.Dislike = Dislike;
+                
                 var add = _unitofworkCommentLikes.Repository.Add(comLik);
                 if (add != null)
                 {

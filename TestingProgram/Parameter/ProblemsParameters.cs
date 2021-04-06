@@ -19,6 +19,7 @@ namespace TestingProgram.Parameter
         public string User_Id { get; set; }
         public string Description { get; set; }
         public int? Solved { get; set; }
+        public string Date { get; set; }
     }
     public class ProblemsParametersGetAll
     {
@@ -27,6 +28,7 @@ namespace TestingProgram.Parameter
         public string Title { get; set; }
         public string Description { get; set; }
         public int? Solved { get; set; }
+        public string Date { get; set; }
     }
 
 }

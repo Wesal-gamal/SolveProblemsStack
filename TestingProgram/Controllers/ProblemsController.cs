@@ -59,6 +59,7 @@ namespace TestingProgram.Controllers
                 Prob.Title = Problem.Title;
                 Prob.Description = Problem.Description;
                 Prob.Solved = Problem.Solved;
+                Prob.Date = DateTime.Now;
                 var putProblem = _unitofworkProblems.Repository.Add(Prob);
                 if (putProblem != null)
                 {
@@ -102,7 +103,7 @@ namespace TestingProgram.Controllers
             ProbDto.Title = Problem.Title;
             ProbDto.Description = Problem.Description;
             ProbDto.Solved = Problem.Solved;
-
+            ProbDto.Date = Problem.Date.ToString("yyyy-mm-dd hh:mm:ss");
             var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(ProbDto, status: RepositoryActionStatus.Ok);
             var result = HttpHandeller.GetResult(repositoryResult);
             return result;
@@ -165,6 +166,7 @@ namespace TestingProgram.Controllers
                     Prob.Title = Problem.Title;
                     Prob.Description = Problem.Description;
                     Prob.Solved = Problem.Solved;
+                    Prob.Date = DateTime.Now;
                     _unitofworkProblems.Repository.Update(Prob);
                     var result = await _unitofworkProblems.SaveChanges() > 0;
                     if (result)
@@ -237,6 +239,7 @@ namespace TestingProgram.Controllers
                 ProblemsObj.Id = itemProblem.Id;
                 ProblemsObj.Title = itemProblem.Title;
                 ProblemsObj.Description = itemProblem.Description;
+                ProblemsObj.Date = itemProblem.Date.ToString("yyyy-mm-dd hh:mm:ss");
                 var Solutions = _unitofworkSolutions.Repository.FindQueryable(q => q.Problem_Id == itemProblem.Id);
                 foreach (var itemSolution in Solutions)
                 {
@@ -245,7 +248,7 @@ namespace TestingProgram.Controllers
                     SolutionsObj.Content = itemSolution.Content;
                     SolutionsObj.LikesCount = _unitofworkSolutionLikes.Repository.FindQueryable(q => q.Solution_Id  == itemSolution.Id && q.Like == true).ToList().Count();
                     SolutionsObj.DisLikeCount = _unitofworkSolutionLikes.Repository.FindQueryable(q => q.Solution_Id == itemSolution.Id && q.Dislike == true).ToList().Count();
-
+                    SolutionsObj.Date =itemSolution.Date.ToString("yyyy-MM-dd H:mm");
                     ProblemsObj.Solutions.Add(SolutionsObj);
                     var Comments = _unitofworkComments.Repository.FindQueryable(q => q.Solution_Id == itemSolution.Id);
 
@@ -256,6 +259,7 @@ namespace TestingProgram.Controllers
                         CommentsObj.Content = itemComments.Content;
                         CommentsObj.LikesCount = _unitofworkCommentLikes.Repository.FindQueryable(q => q.Comment_Id == itemComments.Id&&q.Like==true).ToList().Count();
                         CommentsObj.DisLikeCount = _unitofworkCommentLikes.Repository.FindQueryable(q => q.Comment_Id == itemComments.Id && q.Dislike == true).ToList().Count();
+                        CommentsObj .Date = itemComments.Date.ToString("yyyy-MM-dd H:mm");
                         SolutionsObj.comments.Add(CommentsObj);
                       
                     }
