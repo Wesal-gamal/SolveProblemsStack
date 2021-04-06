@@ -51,31 +51,7 @@ namespace TestingProgram.Controllers
             _config = config;
         }
 
-        //[AllowAnonymous]
-        //[HttpPost (nameof(Register))]
-        //public async Task<IRepositoryResult> Register([FromForm] UsersParameters users)
-        //{
-        //    var user = new ApplicationUser();
-        //    user.Name = users.Name;
-        //    user.UserName = users.UserName;
-        //    user.PasswordHash = users.PasswordHash;
-        //    user.Email = users.Email;
-        //    user.Image = users.Image;
-        //    unitofworkUsers.Repository.Add(user);
-        //    var saved =await unitofworkUsers.SaveChanges() > 0;
-        //    if(saved)
-        //    {
-        //        var repositoryResult = repositoryActionResult.GetRepositoryActionResult(user.Id, status: RepositoryActionStatus.Created, message: "Saved Successfully");
-        //        var result = HttpHandeller.GetResult(repositoryResult);
-        //        return result;
-        //    }
-        //    else
-        //    {
-        //        var repositoryResult = repositoryActionResult.GetRepositoryActionResult(status: RepositoryActionStatus.Error, message: "Faild ");
-        //        var result = HttpHandeller.GetResult(repositoryResult);
-        //        return result;
-        //    }
-        //}
+  
 
         [AllowAnonymous]
         [HttpPost(nameof(InsertAccounts))]
@@ -130,55 +106,6 @@ namespace TestingProgram.Controllers
             var result = HttpHandeller.GetResult(repositoryResult);
             return result;
         }
-
-
-        [HttpPost(nameof(UpdateAccount))]
-        public async Task<IRepositoryResult> UpdateAccount([FromBody] UpdateUserParameters model)
-        {
-            try
-            {
-                var User = await _userManager.FindByIdAsync(model.Id.Trim());
-
-                if (User == null)
-                {
-                    return HttpHandeller.GetResult(_repositoryActionResult.GetRepositoryActionResult(message: "There is no user with this Id: " + model.Id.Trim() + ".", status: RepositoryActionStatus.NotFound));
-                }
-
-                User.Name = model.Name.Trim();
-                User.UserName = model.UserName.Trim();
-                User.Email = model.Email.Trim();
-
-                await _userManager.ResetPasswordAsync(User, await _userManager.GeneratePasswordResetTokenAsync(User), model.Password);
-
-                var result = await _userManager.UpdateAsync(User);
-
-                if (result.Succeeded)
-                {
-                    var repository = _repositoryActionResult.GetRepositoryActionResult(User.UserName, status: RepositoryActionStatus.Updated, message: "Updated Successfully");
-                    var resultt = HttpHandeller.GetResult(repository);
-                    return resultt;
-
-                }
-                string mesg = "";
-
-
-                foreach (var error in result.Errors)
-                {
-                    mesg += error.Description + " ";
-                }
-                var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(status: RepositoryActionStatus.BadRequest, message: mesg);
-                var result2 = HttpHandeller.GetResult(repositoryResult);
-                return result2;
-
-            }
-            catch (Exception e)
-            {
-                var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(exception: e, message: ResponseActionMessages.Error, status: RepositoryActionStatus.Error);
-                var result = HttpHandeller.GetResult(repositoryResult);
-                return result;
-            }
-        }
-
 
         [AllowAnonymous]
         [HttpPost(nameof(Login))]
@@ -267,5 +194,34 @@ namespace TestingProgram.Controllers
         //        return resultt;
         //    }
         //}
+        [AllowAnonymous]
+        [HttpPost(nameof(UpdateAccounts))]
+        public async Task<IRepositoryResult> UpdateAccounts(ChangePasswordParameter parameter)
+        {
+
+            var User = await _userManager.FindByIdAsync(parameter.Id.Trim());
+
+            if (User == null)
+            {
+                return HttpHandeller.GetResult(_repositoryActionResult.GetRepositoryActionResult(message: "There is no user with this Id: " + parameter.Id.Trim() + ".", status: RepositoryActionStatus.NotFound));
+            }
+
+            User.UserName = parameter.UserName.Trim();
+            User.Email = parameter.Email.Trim();
+            if (parameter != null)
+                {
+                    var result = await _userManager.ChangePasswordAsync(User, parameter.OldPassword, parameter.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        return HttpHandeller.GetResult(new RepositoryActionResult(result: true, status: RepositoryActionStatus.Ok, exception: null,  "Updated Successfully."));
+
+                    }
+                    return HttpHandeller.GetResult(new RepositoryActionResult(result: result, status: RepositoryActionStatus.Error, exception: null, message: result.Errors.First().Description));
+                }
+                return HttpHandeller.GetResult(new RepositoryActionResult(result: null, status: RepositoryActionStatus.NotFound, exception: null, message: "No User with Username: " + parameter.UserName));
+            
+         //   return HttpHandeller.GetResult(new RepositoryActionResult(result: null, status: RepositoryActionStatus.NotFound, exception: null, message: "No Company with Unique Name: " ));
+        }
+
     }
 }
