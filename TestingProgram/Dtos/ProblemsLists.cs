@@ -14,7 +14,10 @@ namespace TestingProgram.Dtos
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
+        public string Date { get; set; }
+
         public List<SolutionsListsDto> Solutions { get; set; }
+
     }
     public class SolutionsListsDto
     {
@@ -26,6 +29,8 @@ namespace TestingProgram.Dtos
         public string Content { get; set; }
         public int LikesCount { get; set; }
         public int DisLikeCount { get; set; }
+        public string Date { get; set; }
+
         public List<CommentsListsDto> comments { get; set; }
     }
     public class CommentsListsDto
@@ -34,5 +39,9 @@ namespace TestingProgram.Dtos
         public string Content { get; set; }
         public int LikesCount { get; set; }
         public int DisLikeCount { get; set; }
+        public string Date { get; set; }
+
+
+
     }
-    }
+}

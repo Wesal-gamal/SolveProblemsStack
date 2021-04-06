@@ -18,7 +18,6 @@ namespace TestingProgram
                 .UseDefaultServiceProvider(options =>
                                             options.ValidateScopes = false)
                                             .Build().Run();
-
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

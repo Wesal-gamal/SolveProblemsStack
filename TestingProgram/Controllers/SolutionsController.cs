@@ -45,6 +45,8 @@ namespace TestingProgram.Controllers
                 Solution.Problem_Id = SolutionsPrm.Problem_Id;
                 Solution.User_Id = _ISolutionsBusiness.GetUserId();
                 Solution.Content = SolutionsPrm.Content;
+                Solution.Date = DateTime.Now;
+
                 var added = _unitofworkSolutions.Repository.Add(Solution);
                 if (added != null)
                 {
@@ -115,7 +117,7 @@ namespace TestingProgram.Controllers
             SolutionDto.Problem_Id = Solution.Problem_Id;
             SolutionDto.User_Id = Solution.User_Id;
             SolutionDto.Content = Solution.Content;
-
+            SolutionDto .Date = Solution.Date.ToString("yyyy-MM-dd H:mm");
 
             var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(SolutionDto, status: RepositoryActionStatus.Ok);
             var result = HttpHandeller.GetResult(repositoryResult);
@@ -134,6 +136,8 @@ namespace TestingProgram.Controllers
 
                     Solutions.Id = Solution.Id;
                     Solutions.Content = Solution.Content;
+                    Solutions.Date = DateTime.Now;
+
                     _unitofworkSolutions.Repository.Update(Solutions);
                     var result = await _unitofworkSolutions.SaveChanges() > 0;
                     if (result)
