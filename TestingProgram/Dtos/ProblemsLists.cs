@@ -28,7 +28,9 @@ namespace TestingProgram.Dtos
         public int Id { get; set; }
         public string Content { get; set; }
         public int LikesCount { get; set; }
+        public bool IsLike { get; set; }
         public int DisLikeCount { get; set; }
+        public bool IsDisLike { get; set; }
         public string Date { get; set; }
 
         public List<CommentsListsDto> comments { get; set; }
@@ -37,8 +39,10 @@ namespace TestingProgram.Dtos
     {
         public int Id { get; set; }
         public string Content { get; set; }
+        public bool IsLike { get; set; }
         public int LikesCount { get; set; }
         public int DisLikeCount { get; set; }
+        public bool IsDisLike { get; set; }
         public string Date { get; set; }
 
 
