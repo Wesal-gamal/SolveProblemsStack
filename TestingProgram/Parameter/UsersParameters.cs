@@ -59,4 +59,19 @@ namespace TestingProgram.Parameter
         public string ConfirmPassword { get; set; }
 
     }
+    public class NewUpdateUserParameters
+    {
+        [Required]
+        public string Id { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string UserName { get; set; }
+        [Required]
+        public string Email { get; set; }
+        [Required]
+        public string CurrentPassword { get; set; }
+        [Required]
+        public string NewPassword { get; set; }
+    }
 }
