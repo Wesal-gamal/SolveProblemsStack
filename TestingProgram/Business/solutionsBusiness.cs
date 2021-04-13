@@ -13,6 +13,7 @@ namespace TestingProgram.Business
         private readonly IUnitOfWork<SolutionLikes> _unitofworkSolutionsLikes;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+       
         public solutionsBusiness(IUnitOfWork<SolutionLikes> unitofworkSolutionsLikes,
             IHttpContextAccessor httpContextAccessor
             )

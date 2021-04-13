@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using TestingProgram.Business;
 using TestingProgram.Parameter;
 
 namespace TestingProgram.Controllers
@@ -29,6 +30,7 @@ namespace TestingProgram.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly MyDBContext _contextDb;
         private readonly IConfiguration _config;
+        private readonly ISolutionsBusiness _ISolutionsBusiness;
 
         public UsersController( 
             IUnitOfWork<ApplicationUser> unitofworkUsers, 
@@ -38,7 +40,7 @@ namespace TestingProgram.Controllers
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration config,
-
+            ISolutionsBusiness ISolutionsBusiness,
         MyDBContext contextDb)
              : base(ActionResultResponseHandler, HttpContextAccessor
                    )
@@ -49,6 +51,7 @@ namespace TestingProgram.Controllers
             _userManager = userManager;
             _contextDb = contextDb;
             _config = config;
+            _ISolutionsBusiness = ISolutionsBusiness;
         }
 
   
@@ -101,10 +104,20 @@ namespace TestingProgram.Controllers
         [HttpGet("GetUsers")]
         public async Task<IRepositoryResult> GetUsers()
         {
-            var useres = await _unitofworkUsers.Repository.GetAll();
-            var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(useres.ToList(), status: RepositoryActionStatus.Ok, message: "Found");
-            var result = HttpHandeller.GetResult(repositoryResult);
-            return result;
+            try 
+            {
+                var useres = await _unitofworkUsers.Repository.GetAll();
+                var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(useres, status: RepositoryActionStatus.Ok, message: "Found");
+                var result = HttpHandeller.GetResult(repositoryResult);
+                return result;
+            }
+            catch (Exception e)
+            {
+                var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(exception: e, message: ResponseActionMessages.Error, status: RepositoryActionStatus.Error);
+                var result = HttpHandeller.GetResult(repositoryResult);
+                return result;
+            }
+          
         }
 
         [AllowAnonymous]
@@ -223,6 +236,7 @@ namespace TestingProgram.Controllers
          //   return HttpHandeller.GetResult(new RepositoryActionResult(result: null, status: RepositoryActionStatus.NotFound, exception: null, message: "No Company with Unique Name: " ));
         }
 
+            
         [HttpPost(nameof(NewUpdateAccount))]
         public async Task<IRepositoryResult> NewUpdateAccount([FromBody] NewUpdateUserParameters NewUser)
         {
@@ -269,6 +283,32 @@ namespace TestingProgram.Controllers
             var result2 = HttpHandeller.GetResult(repositoryRes);
             return result2;
         }
+
+
+        
+        [HttpGet("GetDataOfUser")]
+        public async Task<IRepositoryResult> GetDataOfUser()
+        {
+
+            var useres =  _unitofworkUsers.Repository.FindQueryable(q => q.Id == _ISolutionsBusiness.GetUserId()).Select (i => new 
+            {
+                i.UserName,
+                i.Email, 
+                i.Id,
+                i.Name
+            });
+            if (useres != null)
+            {
+                var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(useres, status: RepositoryActionStatus.Ok, message: "Found");
+                var result = HttpHandeller.GetResult(repositoryResult);
+                return result;
+            }
+            var repositoryResultNotFound = _repositoryActionResult.GetRepositoryActionResult( status: RepositoryActionStatus.NotFound, message: "NotFound");
+            var resultNotFound = HttpHandeller.GetResult(repositoryResultNotFound);
+            return resultNotFound;
+
+        }
+
 
     }
 }

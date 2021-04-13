@@ -36,10 +36,12 @@ namespace TestingProgram
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.AddControllers().AddNewtonsoftJson(option => option.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
             services.AddDbContext<MyDBContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("Defualtstring"))
-                 .UseLazyLoadingProxies());//false);
+                 .UseLazyLoadingProxies(false));//false);
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<MyDBContext>()
