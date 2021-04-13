@@ -1,5 +1,7 @@
 ﻿using Attendleave.Erp.Core.APIUtilities;
 using Attendleave.Erp.Core.UnitOfWork;
+using Attendleave.Erp.ServiceLayer.Abstraction;
+using Attendleave.Erp.ServiceLayer.BaseDto;
 using DataLayer.Tables;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +26,7 @@ namespace TestingProgram.Controllers
         private readonly IUnitOfWork<CommentLikes> _unitofworkCommentLikes;
         private readonly IUnitOfWork<SolutionLikes> _unitofworkSolutionLikes;
         private readonly IUnitOfWork<Comments> _unitofworkComments;
+        private readonly IPagedList<ProblemsListsDto, ProblemsListsDto> pagedListJobs;
         private readonly IRepositoryActionResult _repositoryActionResult;
         private readonly ISolutionsBusiness _ISolutionsBusiness;
 
@@ -222,8 +225,9 @@ namespace TestingProgram.Controllers
         }
 
 
-        [HttpGet("GetListProblem")]
-        public async Task<IRepositoryResult> GetListProblem()
+        //  [HttpGet("GetListProblem")]
+        [HttpGet(nameof(GetListProblem))]
+        public async Task<IRepositoryResult> GetListProblem(PageParameter parameter)
         {
             var Problem = _unitofworkProblems.Repository.FindQueryable(q => q.Id > 0);
             if (Problem == null)
@@ -239,7 +243,7 @@ namespace TestingProgram.Controllers
                 ProblemsObj.Id = itemProblem.Id;
                 ProblemsObj.Title = itemProblem.Title;
                 ProblemsObj.Description = itemProblem.Description;
-                ProblemsObj.Date = itemProblem.Date.ToString("yyyy-mm-dd hh:mm:ss");
+                ProblemsObj.Date = itemProblem.Date.ToString("yyyy-MM-dd H:mm");
                 var Solutions = _unitofworkSolutions.Repository.FindQueryable(q => q.Problem_Id == itemProblem.Id);
                 foreach (var itemSolution in Solutions)
                 {
@@ -247,7 +251,25 @@ namespace TestingProgram.Controllers
                     SolutionsObj.Id = itemSolution.Id;
                     SolutionsObj.Content = itemSolution.Content;
                     SolutionsObj.LikesCount = _unitofworkSolutionLikes.Repository.FindQueryable(q => q.Solution_Id  == itemSolution.Id && q.Like == true).ToList().Count();
+                    if (SolutionsObj.LikesCount == 0)
+                    {
+                        SolutionsObj.IsLike = false;
+
+                    }
+                    else
+                    {
+                        SolutionsObj.IsLike = true;
+                    }
                     SolutionsObj.DisLikeCount = _unitofworkSolutionLikes.Repository.FindQueryable(q => q.Solution_Id == itemSolution.Id && q.Dislike == true).ToList().Count();
+                    if (SolutionsObj.DisLikeCount == 0)
+                    {
+                        SolutionsObj.IsDisLike = false;
+
+                    }
+                    else
+                    {
+                        SolutionsObj.IsDisLike = true;
+                    }
                     SolutionsObj.Date =itemSolution.Date.ToString("yyyy-MM-dd H:mm");
                     ProblemsObj.Solutions.Add(SolutionsObj);
                     var Comments = _unitofworkComments.Repository.FindQueryable(q => q.Solution_Id == itemSolution.Id);
@@ -258,7 +280,25 @@ namespace TestingProgram.Controllers
                         CommentsObj.Id = itemComments.Id;
                         CommentsObj.Content = itemComments.Content;
                         CommentsObj.LikesCount = _unitofworkCommentLikes.Repository.FindQueryable(q => q.Comment_Id == itemComments.Id&&q.Like==true).ToList().Count();
+                        if (CommentsObj.LikesCount == 0)
+                        {
+                            CommentsObj.IsLike = false;
+
+                        }
+                        else
+                        {
+                            CommentsObj.IsLike = true;
+                        }
                         CommentsObj.DisLikeCount = _unitofworkCommentLikes.Repository.FindQueryable(q => q.Comment_Id == itemComments.Id && q.Dislike == true).ToList().Count();
+                        if (CommentsObj.DisLikeCount == 0)
+                        {
+                            CommentsObj.IsDisLike = false;
+
+                        }
+                        else
+                        {
+                            CommentsObj.IsDisLike = true;
+                        }
                         CommentsObj .Date = itemComments.Date.ToString("yyyy-MM-dd H:mm");
                         SolutionsObj.comments.Add(CommentsObj);
                       
@@ -266,8 +306,8 @@ namespace TestingProgram.Controllers
                 }
                 ProblemsObjLists.Add(ProblemsObj);
             }
-         
 
+           // var result = await _pagedListJobs.GetGenericPaginationAsync(ProblemsObjLists, parameter.PageNumber, parameter.PageSize);
             var repositoryResult = _repositoryActionResult.GetRepositoryActionResult(ProblemsObjLists, status: RepositoryActionStatus.Ok);
             var result = HttpHandeller.GetResult(repositoryResult);
             return result;

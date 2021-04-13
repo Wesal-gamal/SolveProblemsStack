@@ -39,7 +39,7 @@ namespace TestingProgram
             services.AddDbContext<MyDBContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("Defualtstring"))
-                 .UseLazyLoadingProxies());//false);
+                 .UseLazyLoadingProxies(false));//false);
 
             services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<MyDBContext>()
